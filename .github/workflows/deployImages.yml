@@ -68,15 +68,10 @@ jobs:
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-          - name: where am i 
-            run: |
-              pwd 
-              ls
           - name: Build and push
             uses: docker/build-push-action@v6.4.0
             with:
               context: .
-              # file: /home/runner/work/test/test/Store/Dockerfile
               push: true
               tags: ${{ steps.meta.outputs.tags }}
               labels: ${{ steps.meta.outputs.labels }}

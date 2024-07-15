@@ -33,3 +33,22 @@ jobs:
               docker build . --tag ghcr.io/ahmed-shoushaa/store:latest
               docker push ghcr.io/ahmed-shoushaa/store:latest
               docker pull ghcr.io/ahmed-shoushaa/store:latest
+
+          # - name: Get or create an OCIR Repository
+          #   uses: oracle-actions/get-ocir-repository@v1.3.0
+          #   id: get-ocir-repository
+          #   with:
+          #     name: store
+          #     compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
+
+          - name: Log into OCIR
+            uses: oracle-actions/login-ocir@v1.3.0
+            id: login-ocir
+            with:
+              auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
+
+          - name: Tag and push a container image
+            id: tag-and-push-image
+            run: |
+              docker tag ghcr.io/ahmed-shoushaa/store:latest  fra.ocir.io/frxpd492cljs/store:latest
+              docker push fra.ocir.io/frxpd492cljs/store:1

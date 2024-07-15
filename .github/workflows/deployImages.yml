@@ -3,7 +3,7 @@ name: Deploy Images to GHCR
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: store
-  
+
 on:
   push:
     branches:
@@ -24,10 +24,6 @@ jobs:
         defaults:
           run:
             working-directory: './Store'
-        steps:
-          - name: 'tst'
-            run: |
-              docker images
 
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
@@ -59,9 +55,25 @@ jobs:
             with:
               auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
 
-          - name: Tag and push a container image
-            id: tag-and-push-image
-            run: |
-              docker tag ghcr.io/ahmed-shoushaa/store:latest fra.ocir.io/frxpd492cljs/store:latest
-              docker push fra.ocir.io/frxpd492cljs/store:latest
-#docker tag fra.ocir.io/frxpd492cljs/store:latest ghcr.io/ahmed-shoushaa/store:latest
+          - name: Extract metadata (tags, labels) for Docker
+            id: meta
+            uses: docker/metadata-action@v5
+            with:
+              images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+          - name: Build and push
+            uses: docker/build-push-action@v5
+            with:
+              context: .
+              file: ./Dockerfile
+              push: true
+              tags: ${{ steps.meta.outputs.tags }}
+              labels: ${{ steps.meta.outputs.labels }}
+
+
+
+          # - name: Tag and push a container image
+          #   id: tag-and-push-image
+          #   run: |
+          #     docker tag ghcr.io/ahmed-shoushaa/store:latest fra.ocir.io/frxpd492cljs/store:latest
+          #     docker push fra.ocir.io/frxpd492cljs/store:latest

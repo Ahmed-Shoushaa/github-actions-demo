@@ -61,6 +61,10 @@ jobs:
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+          - name: where am i 
+            run: |
+              pwd 
+
           - name: Build and push
             uses: docker/build-push-action@v5
             with:

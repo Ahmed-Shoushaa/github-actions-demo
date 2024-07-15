@@ -57,5 +57,6 @@ jobs:
           - name: Tag and push a container image
             id: tag-and-push-image
             run: |
-              docker push fra.ocir.io/frxpd492cljs/store:1
+              docker tag ghcr.io/ahmed-shoushaa/store:latest fra.ocir.io/frxpd492cljs/store:latest
+              docker push fra.ocir.io/frxpd492cljs/store:latest
 #docker tag fra.ocir.io/frxpd492cljs/store:latest ghcr.io/ahmed-shoushaa/store:latest

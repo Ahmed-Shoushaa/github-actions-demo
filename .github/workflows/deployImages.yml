@@ -76,7 +76,8 @@ jobs:
             uses: docker/build-push-action@v5
             with:
               #context: git
-              # file: /home/runner/work/test/test/Store/Dockerfile
+              file: /home/runner/work/test/test/Store/Dockerfile
+              context: "{{defaultContext}}:Store/CodeFile"
               push: true
               tags: ${{ steps.meta.outputs.tags }}
               labels: ${{ steps.meta.outputs.labels }}

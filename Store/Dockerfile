@@ -11,7 +11,7 @@ COPY ./CodeFile/package*.json ./
 RUN npm install
 
 # Copy the app source code to the working directory
-COPY CodeFile/app.js .
+COPY ./CodeFile/app.js .
 
 # Expose the port that the app is running on
 EXPOSE 3000

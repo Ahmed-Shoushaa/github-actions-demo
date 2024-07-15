@@ -73,9 +73,9 @@ jobs:
               pwd 
               ls
           - name: Build and push
-            uses: docker/build-push-action@v5
+            uses: docker/build-push-action@v6.4.0
             with:
-              context: .
+              # context: .
               file: /home/runner/work/test/test/Store/Dockerfile
               push: true
               tags: ${{ steps.meta.outputs.tags }}

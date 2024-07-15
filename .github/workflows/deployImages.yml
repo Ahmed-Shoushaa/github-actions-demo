@@ -30,3 +30,4 @@ jobs:
             run: |
               docker build . --tag ghcr.io/ahmed-shoushaa/store:latest
               docker push ghcr.io/ahmed-shoushaa/store:latest
+

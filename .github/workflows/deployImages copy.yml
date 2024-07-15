@@ -1,0 +1,85 @@
+name: Deploy Images to GHCR
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: store
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+
+jobs:
+      push-store-image:
+        runs-on: ubuntu-latest
+        env:
+          OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+          OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+          OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        permissions:
+          packages: write
+        defaults:
+          run:
+            working-directory: './Store'
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          -
+            name: Set up QEMU
+            uses: docker/setup-qemu-action@v3
+          -
+            name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v3
+
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v3
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.PAT_TOKEN}}
+
+          - name: 'Build Inventory Image'
+            run: |
+              docker build . --tag ghcr.io/ahmed-shoushaa/store:latest
+              docker push ghcr.io/ahmed-shoushaa/store:latest
+              docker pull ghcr.io/ahmed-shoushaa/store:latest
+              docker images
+
+          - name: Get or create an OCIR Repository
+            uses: oracle-actions/get-ocir-repository@v1.3.0
+            id: get-ocir-repository
+            with:
+              name: store
+              compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
+
+          - name: Log into OCIR
+            uses: oracle-actions/login-ocir@v1.3.0
+            id: login-ocir
+            with:
+              auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
+
+          - name: Extract metadata (tags, labels) for Docker
+            id: meta
+            uses: docker/metadata-action@v5
+            with:
+              images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+          - name: Build and push
+            uses: docker/build-push-action@v6.4.0
+            with:
+              context: .
+              push: true
+              tags: fra.ocir.io/frxpd492cljs/store:latest
+              labels: ${{ steps.meta.outputs.labels }}
+
+
+
+          # - name: Tag and push a container image
+          #   id: tag-and-push-image
+          #   run: |
+          #     docker tag ghcr.io/ahmed-shoushaa/store:latest fra.ocir.io/frxpd492cljs/store:latest
+          #     docker push fra.ocir.io/frxpd492cljs/store:latest
